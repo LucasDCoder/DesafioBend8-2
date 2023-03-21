@@ -1,7 +1,6 @@
 {
   "name": "proyectofinal2",
   "version": "1.0.0",
-  "description": "",
   "main": "index.js",
   "type": "module",
   "scripts": {
@@ -15,12 +14,23 @@
     "nodemon": "^2.0.21"
   },
   "dependencies": {
+    "@handlebars/allow-prototype-access": "^1.0.5",
     "express": "^4.18.2",
     "express-handlebars": "^7.0.2",
+    "handlebars": "^4.7.7",
     "mongoose": "^7.0.2",
     "mongoose-paginate-v2": "^1.7.1",
     "multer": "^1.4.5-lts.1",
     "nodeman": "^1.1.2",
     "socket.io": "^4.6.1"
-  }
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/LucasDCoder/ProyectoBend2.git"
+  },
+  "bugs": {
+    "url": "https://github.com/LucasDCoder/ProyectoBend2/issues"
+  },
+  "homepage": "https://github.com/LucasDCoder/ProyectoBend2#readme",
+  "description": ""
 }
