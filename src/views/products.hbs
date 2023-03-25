@@ -25,8 +25,9 @@
 
 
  <div>
-        <a href="/products?page={{result.prevPage}}&&limit=">Prev</a>
-        <a href="/products?page={{result.nextPage}}">Next</a>
+<a href="/products?page={{result.prevPage}}&limit={{result.limit}}">Prev</a>
+
+<a href="/products?page={{result.nextPage}}&limit={{result.limit}}">Next</a>
     </div>
 <h5>
       {{ result.page }} / {{ result.totalPages }}
