@@ -1,67 +1,49 @@
-import express from 'express'
-import productRoutes from './src/routes/products.routes.js'
-import viewsRoutes from './src/routes/views.routes.js'
-import chatRoutes from './src/routes/chat.routes.js'
-import handlebars from 'express-handlebars'
-import cartRoutes from './src/routes/carts.routes.js'
-import mongoose from 'mongoose'
-import __dirname from './dirname.js'
-import chatDao from './src/dao/chatDao.js'
-import Handlebars from 'handlebars'
+import express from "express";
+import cookieParser from "cookie-parser";
+import session from "express-session";
+import viewsRoutes from "./src/routes/views.routes.js";
+import sessionRoutes from "./src/routes/session.routes.js";
+import __dirname from "./dirname.js";
+import handlebars from "express-handlebars";
+import MongoStore from "connect-mongo";
+import mongoose from "mongoose";
 import path from 'path'
-import { Server } from 'socket.io'
-import { allowInsecurePrototypeAccess } from '@handlebars/allow-prototype-access'
-const app = express()
-
-app.use(express.json())
-app.use(express.urlencoded({ extended: true }))
+const app = express();
 
 
-
-const httpServer = app.listen(8080, () => console.log("Listening on port 8080"))
-const io = new Server(httpServer)
-
-
-
-app.engine('hbs', handlebars.engine({
-  extname: 'hbs',
-  defaultLayout: 'main',
-  handlebars: allowInsecurePrototypeAccess(Handlebars)
-}))
-app.set('views', __dirname + '/src/views')
-app.set('view engine', 'hbs')
-app.use(express.static(path.join(__dirname, '/src/public')));
-
-
-
-app.use('/', viewsRoutes)
-app.use('/chat', chatRoutes)
-app.use('/api/products', productRoutes)
-app.use('/api/carts', cartRoutes)
-
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+app.use(cookieParser());
+app.use(
+  session({
+    store: MongoStore.create({
+      mongoUrl: "mongodb+srv://lucasdcoder:coderhouse@cluster0.bkk7dvj.mongodb.net/?retryWrites=true&w=majority",
+      mongoOptions: {
+        useNewUrlParser: true,
+        useUnifiedTopology: true,
+      },
+      ttl: 60*60,
+    }),
+    secret: "coderhouse",
+    resave: false,
+    saveUninitialized: false,
+  })
+);
 
 mongoose.set('strictQuery', false)
-mongoose.connect('mongodb+srv://lucasdcoder:coderhouse@cluster0.bkk7dvj.mongodb.net/?retryWrites=true&w=majority',)
-.then(mensaje => console.log("Conectado"))
-.catch(error => console.log(error.message))
+mongoose.connect("mongodb+srv://lucasdcoder:coderhouse@cluster0.bkk7dvj.mongodb.net/?retryWrites=true&w=majority" )
+  .then(() => console.log("Connected to MongoDB"))
 
-io.on('connection', async (socket) => {
+app.engine('hbs', handlebars.engine({
+  extname: '.hbs',
+  defaultLayout: 'main'
+}))
+app.set('view engine', 'hbs');
+app.set('views', `${__dirname}/views`);
 
-  socket.emit("historialChat", await chatDao.getMessages())
+app.use("/", viewsRoutes);
+app.use("/session", sessionRoutes);
+console.log(__dirname)
+app.use(express.static(path.join(__dirname, '/public')));
 
-
-  socket.on("mensajeNuevo", async (data) => {
-    let message = {
-      user: data.user,
-      message: data.message
-    }
-    await chatDao.registerMessage(message)
-    io.emit("historialChat", await chatDao.getMessages())
-
-  })
-
-
-})
-
-
-
+app.listen(8080, () => console.log("Server running on port 8080"))
